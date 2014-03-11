@@ -1,10 +1,17 @@
 from __future__ import print_function
 import urlparse
-import util.url_util
-import util.storage_util
+import urllib
 import sys
 from lxml import etree
 __author__ = 'tasyrkin'
+
+def read_document_from_url(url_str):
+	filehandle = urllib.urlopen(url_str)
+	url_lines = filehandle.readlines()
+	document_content = ''
+	for line in url_lines:
+		document_content += line
+	return document_content
 
 def traverse_web_graph(start_url):
 
@@ -32,9 +39,10 @@ def traverse_web_graph(start_url):
 		visited_urls.add(url)
 
 		try:
-			html_dom = etree.HTML(util.url_util.readUrlAsString(url))
-		except Exception:
+			html_dom = etree.HTML(read_document_from_url(url))
+		except Exception, e:
 			error_urls_count = error_urls_count + 1
+			print (str.format('Exception occured: {}', str(e)))
 			continue
 		
 		links = html_dom.xpath('//a')
