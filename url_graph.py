@@ -1,33 +1,32 @@
 
 
-class Url:
+class UrlNode:
 
 	def __init__(self, name):
 		self.name = name
 		self.urls = list()
 
-	def add_url(self, url):
+	def add_url_node(self, url_node):
 		self.urls.append(url)
 	
-	def add_urls(self, urls):
+	def add_url_nodes(self, url_nodes):
 		self.urls.extend(urls)
 
 class UrlGraph:
-	
-	def __init__(self, url):
-		self.url = url
+	init_url_node = None
 
-	def get_url_by_name(self, url_name):
+	def __init__(self, url_node):
+		self.init_url_node = url_node
+
+	def find_url_node_by_name(self, url_node):
 		except NotImplementedError()
 
-NAME_PATTERN_URLS_GRAPH = 'urls_graph_'
-class FilePersister:
+class UrlGraphFileSystemPersister:
 	def __init__(self, folder):
 		self.folder = folder
 	
-	def get_url_graph(self):
-		
-		except NotImplementedError()
+	def load_url_graph(self):
+		except NotImplementedError()		
 
 	def save_url_graph(self, url_graph):
 		except NotImplementedError()
