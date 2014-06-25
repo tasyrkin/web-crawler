@@ -3,6 +3,7 @@ import urlparse
 import urllib
 import sys
 from lxml import etree
+from crawler_params import ParamsManager
 __author__ = 'tasyrkin'
 
 def read_document_from_url(url_str):
@@ -65,13 +66,6 @@ def traverse_web_graph(start_url):
 
 					print ('found links [{0}]'.format(cnt))
 
-if __name__ == '__main__':
+params_manager = ParamsManager(sys.argv)
 
-	print ('Entering main......')
-
-	if len(sys.argv) != 2:
-		raise ValueError("start url must be provided")
-
-	start_url = sys.argv[1]
-
-	traverse_web_graph(start_url)
+traverse_web_graph(params_manager.get(ParamsManager.PARAM_INIT_URL))
