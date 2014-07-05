@@ -9,11 +9,14 @@ class UrlNode:
 		self._name = name
 		self._nodes = set()
 
+	def get_name(self):
+		return self._name
+
 	def add_node(self, url_node):
 		self._nodes.add(url_node)
 
-	def get_name(self):
-		return self._name
+	def get_nodes(self):
+		return self._nodes
 
 	def __str__(self):
 		nlen = len(self._nodes)
@@ -26,6 +29,9 @@ class UrlNode:
 		if not isinstance(other, UrlNode):
 			return False
 		return self._name == other._name
+
+	def __hash__(self):
+		return hash(self._name)
 
 class UrlGraph:
 	'''
