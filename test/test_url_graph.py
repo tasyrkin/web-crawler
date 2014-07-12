@@ -2,18 +2,29 @@ import unittest
 from main.url_graph import UrlGraph
 from main.url_graph import UrlNode
 
-NODE_URL1 = 'http://www.google.com'
-NODE_URL2 = 'http://www.amazon.com'
+NODE_URL_STR1 = 'http://www.google.com'
+NODE_URL_STR2 = 'http://www.amazon.com'
 
 class UrlGraphTest(unittest.TestCase):
 
 	def test_add_connection(self):
 		graph = UrlGraph()
 
-		graph.add_connection(NODE_URL1, NODE_URL2)
+		graph.add_connection(NODE_URL_STR1, NODE_URL_STR2)
 
-		self.assertEquals(UrlNode(NODE_URL1), graph.get_node(NODE_URL1))
-		self.assertEquals(UrlNode(NODE_URL2), graph.get_node(NODE_URL2))
+		self.assertEquals(UrlNode(NODE_URL_STR1), graph.get_node(NODE_URL_STR1))
+		self.assertEquals(UrlNode(NODE_URL_STR2), graph.get_node(NODE_URL_STR2))
+		
+	def test_get_node(self):
+		graph = UrlGraph()
+		
+		graph.add_connection(NODE_URL_STR1, NODE_URL_STR2)
+		
+		node1 = graph.get_node(NODE_URL_STR1)
+		node2 = graph.get_node(NODE_URL_STR2)
+		
+		self.assertTrue(node2 in node1.get_nodes())
+		self.assertTrue(node1 in node2.get_nodes())
 
 if __name__ == '__main__':
 	unittest.main()

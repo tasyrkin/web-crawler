@@ -54,56 +54,16 @@ class UrlGraph:
 			self._nodes[node_url] = node
 		return node
 
-	def add_connection(self, node_url1, node_url2):
+	def add_connection(self, url_node_str1, url_node_str2):
 
-		assert isinstance(node_url1, str) and node_url1.strip() != '', 'Expected non empty url, but was {}'.format(node_url1)
-		assert isinstance(node_url2, str) and node_url2.strip() != '', 'Expected non empty url, but was {}'.format(node_url2)
+		assert isinstance(url_node_str1, str) and url_node_str1.strip() != '', 'Expected non empty url, but was {}'.format(url_node_str1)
+		assert isinstance(url_node_str2, str) and url_node_str2.strip() != '', 'Expected non empty url, but was {}'.format(url_node_str2)
 
-		node1 = self._add_if_not_exists_and_get_node(node_url1)
-		node2 = self._add_if_not_exists_and_get_node(node_url2)
+		node1 = self._add_if_not_exists_and_get_node(url_node_str1)
+		node2 = self._add_if_not_exists_and_get_node(url_node_str2)
 
 		node1.add_node(node2)
 		node2.add_node(node1)
 
-	def get_node(self, node_url):
-		return self._nodes.get(node_url)
-
-class FilePersister:
-	NAME_PATTERN_URL_GRAPH = 'url_graph_'
-
-	def __init__(self, folder):
-		self.folder = folder
-	
-	def load_url_graph(self):
-		url_graph_fnames = [fname 
-				for fname in os.listdir(folder) 
-				if fname.startswith(NAME_PATTERN_URL_GRAPH)]
-		if len(url_graph_fnames) == 0:
-			return UrlGraph()
-		if len(url_graph_fnames) > 1:
-			raise ValueError(str.format('found multiple url graph files: {}', str(url_graph_fnames)))
-		
-		str_to_url_node = dict()
-		init_node = None
-		for line in fileinput(url_graph_fnames[0]):
-			url_to_neighbours = line.split(':')
-			url_str = url_to_neighbours[0]
-			neighbours_str = url_to_neighbours[1].split(',')
-			url_node = str_to_url_node.get(url_str)
-			if not url_node:
-				url_node = UrlNode(url_str)
-				str_to_url_node[url_str] = url_node
-			for neighbour_str in neighbours_str:
-				neighbour_node = str_to_url_node.get(neigbour_str)
-				if not neighbour_node:
-					neighbour_node = UrlNode(neighbour_str)
-					str_to_url_node[neighbour_str] = neighbour_node
-				url_node.add_url_node(neighbour_node)
-			if not init_node:
-				init_node = url_node
-
-		return url_graph(init_node)
-
-	def save_url_graph(self, url_graph):
-		raise NotImplementedError()
-
+	def get_node(self, node_url_str):
+		return self._nodes.get(node_url_str)
