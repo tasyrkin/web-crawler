@@ -59,6 +59,9 @@ class UrlGraph:
 		assert isinstance(url_node_str1, str) and url_node_str1.strip() != '', 'Expected non empty url, but was {}'.format(url_node_str1)
 		assert isinstance(url_node_str2, str) and url_node_str2.strip() != '', 'Expected non empty url, but was {}'.format(url_node_str2)
 
+		url_node_str1 = url_node_str1.strip()
+		url_node_str2 = url_node_str2.strip()
+
 		node1 = self._add_if_not_exists_and_get_node(url_node_str1)
 		node2 = self._add_if_not_exists_and_get_node(url_node_str2)
 
