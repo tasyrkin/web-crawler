@@ -1,6 +1,8 @@
 import logging
+import logging.config
 
-logging.basicConfig(filename='url_graph.log',level=logging.DEBUG)
+logging.config.fileConfig('../resources/logging.conf')
+logger = logging.getLogger(__name__)
 
 class UrlNode:
 	'''
@@ -67,7 +69,7 @@ class UrlGraph:
 		url_node_str2 = url_node_str2.strip()
 		
 		if url_node_str1 == url_node_str2:
-			logging.warn('Attemption to connect the url [{}] to itself is ignored'.format(url_node_str1))
+			logger.warn('Attemption to connect the url [{}] to itself is ignored'.format(url_node_str1))
 			return
 
 		node1 = self._add_if_not_exists_and_get_node(url_node_str1)

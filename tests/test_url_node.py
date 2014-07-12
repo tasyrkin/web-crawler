@@ -1,5 +1,5 @@
 import unittest
-from main.url_graph import UrlNode
+from webcrawler.url_graph import UrlNode
 
 NODE_URL_STR1 = 'http://www.google.com'
 NODE_URL_STR2 = 'http://www.amazon.com'
