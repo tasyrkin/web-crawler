@@ -25,7 +25,7 @@ class UrlGraphTest(unittest.TestCase):
 		node2 = graph.get_node(NODE_URL_STR2)
 
 		self.assertTrue(node2 in node1.get_nodes())
-		self.assertTrue(node1 in node2.get_nodes())
+		self.assertTrue(node1 not in node2.get_nodes())
 
 	def test_add_connection_several_nodes(self):
 		graph = UrlGraph()
@@ -35,8 +35,8 @@ class UrlGraphTest(unittest.TestCase):
 		graph.add_connection(NODE_URL_STR2, NODE_URL_STR3)
 
 		self.assertEquals(2, len(graph.get_node(NODE_URL_STR1).get_nodes()))
-		self.assertEquals(2, len(graph.get_node(NODE_URL_STR2).get_nodes()))
-		self.assertEquals(2, len(graph.get_node(NODE_URL_STR3).get_nodes()))
+		self.assertEquals(1, len(graph.get_node(NODE_URL_STR2).get_nodes()))
+		self.assertEquals(0, len(graph.get_node(NODE_URL_STR3).get_nodes()))
 
 	def test_add_connection_same_node(self):
 		graph = UrlGraph()

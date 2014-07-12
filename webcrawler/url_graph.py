@@ -60,23 +60,22 @@ class UrlGraph:
 	def add_node(self, url_node_str1):
 		return self._add_if_not_exists_and_get_node(url_node_str1)
 
-	def add_connection(self, url_node_str1, url_node_str2):
+	def add_connection(self, url_str_from, url_str_to):
 
-		assert isinstance(url_node_str1, str) and url_node_str1.strip() != '', 'Expected non empty url, but was {}'.format(url_node_str1)
-		assert isinstance(url_node_str2, str) and url_node_str2.strip() != '', 'Expected non empty url, but was {}'.format(url_node_str2)
+		assert isinstance(url_str_from, str) and url_str_from.strip() != '', 'Expected non empty url, but was {}'.format(url_str_from)
+		assert isinstance(url_str_to, str) and url_str_to.strip() != '', 'Expected non empty url, but was {}'.format(url_str_to)
 
-		url_node_str1 = url_node_str1.strip()
-		url_node_str2 = url_node_str2.strip()
+		url_str_from = url_str_from.strip()
+		url_str_to = url_str_to.strip()
 		
-		if url_node_str1 == url_node_str2:
-			logger.warn('Attemption to connect the url [{}] to itself is ignored'.format(url_node_str1))
+		if url_str_from == url_str_to:
+			logger.warn('Attemption to connect the url [{}] to itself is ignored'.format(url_str_from))
 			return
 
-		node1 = self._add_if_not_exists_and_get_node(url_node_str1)
-		node2 = self._add_if_not_exists_and_get_node(url_node_str2)
+		node1 = self._add_if_not_exists_and_get_node(url_str_from)
+		node2 = self._add_if_not_exists_and_get_node(url_str_to)
 
 		node1.add_node(node2)
-		node2.add_node(node1)
 
 	def get_node(self, node_url_str):
 		return self._nodes.get(node_url_str)

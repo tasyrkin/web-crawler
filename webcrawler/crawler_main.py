@@ -4,7 +4,6 @@ import urllib
 import sys
 from lxml import etree
 from crawler_params import ParamsManager
-__author__ = 'tasyrkin'
 
 def read_document_from_url(url_str):
 	filehandle = urllib.urlopen(url_str)
