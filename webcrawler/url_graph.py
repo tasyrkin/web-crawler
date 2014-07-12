@@ -80,3 +80,6 @@ class UrlGraph:
 
 	def get_node(self, node_url_str):
 		return self._nodes.get(node_url_str)
+	
+	def get_nodes(self):
+		return self._nodes.values()

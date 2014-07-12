@@ -52,5 +52,16 @@ class UrlGraphTest(unittest.TestCase):
 
 		self.assertEquals(UrlNode(NODE_URL_STR1), graph.get_node(NODE_URL_STR1))
 
+	def test_get_nodes(self):
+		graph = UrlGraph()
+
+		graph.add_node(NODE_URL_STR1)
+		graph.add_node(NODE_URL_STR2)
+
+		expected_nodes = [graph.get_node(NODE_URL_STR1), graph.get_node(NODE_URL_STR2)]
+
+		self.assertSetEqual(set(graph.get_nodes()), set(expected_nodes))
+
+
 if __name__ == '__main__':
 	unittest.main()
