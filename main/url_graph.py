@@ -3,14 +3,14 @@ import fileinput
 
 class UrlNode:
 	'''
-	Represents a url as a node of a graph
+	Represents a url as a node of a url graph
 	'''
-	def __init__(self, name):
-		self._name = name
+	def __init__(self, url):
+		self._url = url
 		self._nodes = set()
 
-	def get_name(self):
-		return self._name
+	def get_url(self):
+		return self._url
 
 	def add_node(self, url_node):
 		self._nodes.add(url_node)
@@ -18,9 +18,16 @@ class UrlNode:
 	def get_nodes(self):
 		return self._nodes
 
+	def _get_neighbour_urls(self):
+		return map(lambda node: node.get_url(), self._nodes)
+	
+	@staticmethod
+	def _truncate_list_for_string(lst, limit):
+		return str(lst[0:limit]) + (', ...' if len(lst)>limit else '')
+
 	def __str__(self):
-		nlen = len(self._nodes)
-		return self._name + '->' + str(nlen if nlen > 5 else map(lambda node: node.get_name(), self._nodes))
+		neighbour_urls = self._get_neighbour_urls()
+		return self._url + '->' + UrlNode._truncate_list_for_string(neighbour_urls, 10)
 
 	def __repr__(self):
 		return self.__str__()
@@ -28,10 +35,10 @@ class UrlNode:
 	def __eq__(self, other):
 		if not isinstance(other, UrlNode):
 			return False
-		return self._name == other._name
+		return self._url == other._url
 
 	def __hash__(self):
-		return hash(self._name)
+		return hash(self._url)
 
 class UrlGraph:
 	'''
@@ -40,26 +47,26 @@ class UrlGraph:
 	def __init__(self):
 		self._nodes = dict()
 
+	def _add_if_not_exists_and_get_node(self, node_url):
+		node = self._nodes.get(node_url)
+		if node is None:
+			node = UrlNode(node_url)
+			self._nodes[node_url] = node
+		return node
+
 	def add_connection(self, node_url1, node_url2):
 
-		assert isinstance(node_url1, str) and node_url1.strip() != '', 'Expected non empty string, but was {}'.format(node_url1)
-		assert isinstance(node_url2, str) and node_url2.strip() != '', 'Expected non empty string, but was {}'.format(node_url2)
+		assert isinstance(node_url1, str) and node_url1.strip() != '', 'Expected non empty url, but was {}'.format(node_url1)
+		assert isinstance(node_url2, str) and node_url2.strip() != '', 'Expected non empty url, but was {}'.format(node_url2)
 
-		node1 = self._map.get(node_name1)
-		if node1 is None:
-			node1 = UrlNode(node_url1)
-			self._map[node_url1] = node1
-
-		node2 = self._map.get(node_url2)
-		if node2 is None:
-			node2 = UrlNode(node_url2)
-			self._map[node_url2] = node2
+		node1 = self._add_if_not_exists_and_get_node(node_url1)
+		node2 = self._add_if_not_exists_and_get_node(node_url2)
 
 		node1.add_node(node2)
 		node2.add_node(node1)
 
-	def find_url_node(self, node_name):
-		raise NotImplementedError()
+	def get_node(self, node_url):
+		return self._nodes.get(node_url)
 
 class FilePersister:
 	NAME_PATTERN_URL_GRAPH = 'url_graph_'
