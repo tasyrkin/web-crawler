@@ -1,5 +1,6 @@
-import os
-import fileinput
+import logging
+
+logging.basicConfig(filename='url_graph.log',level=logging.DEBUG)
 
 class UrlNode:
 	'''
@@ -47,12 +48,15 @@ class UrlGraph:
 	def __init__(self):
 		self._nodes = dict()
 
-	def _add_if_not_exists_and_get_node(self, node_url):
-		node = self._nodes.get(node_url)
+	def _add_if_not_exists_and_get_node(self, url_node_str):
+		node = self._nodes.get(url_node_str)
 		if node is None:
-			node = UrlNode(node_url)
-			self._nodes[node_url] = node
+			node = UrlNode(url_node_str)
+			self._nodes[url_node_str] = node
 		return node
+
+	def add_node(self, url_node_str1):
+		return self._add_if_not_exists_and_get_node(url_node_str1)
 
 	def add_connection(self, url_node_str1, url_node_str2):
 
@@ -61,6 +65,10 @@ class UrlGraph:
 
 		url_node_str1 = url_node_str1.strip()
 		url_node_str2 = url_node_str2.strip()
+		
+		if url_node_str1 == url_node_str2:
+			logging.warn('Attemption to connect the url [{}] to itself is ignored'.format(url_node_str1))
+			return
 
 		node1 = self._add_if_not_exists_and_get_node(url_node_str1)
 		node2 = self._add_if_not_exists_and_get_node(url_node_str2)
