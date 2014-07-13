@@ -62,6 +62,14 @@ class UrlGraphTest(unittest.TestCase):
 
 		self.assertSetEqual(set(graph.get_nodes()), set(expected_nodes))
 
+	def test__str__(self):
+		graph = UrlGraph()
+
+		graph.add_node(NODE_URL_STR1)
+		graph.add_node(NODE_URL_STR2)
+		graph.add_connection(NODE_URL_STR1, NODE_URL_STR2)
+
+		print graph
 
 if __name__ == '__main__':
 	unittest.main()

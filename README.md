@@ -5,7 +5,7 @@ TODOs:
 * Process only specific media type: `text/html`
 
     * Possible solution: request a resource with `GET` and consider the `Content-Type` header
-    * Possible solution: request only a header with `HEAD` request. Needs to be proved if there are servers which don't implement the method
+    * <s>Possible solution: request only a header with `HEAD` request. Needs to be proved if there are servers which don't implement the method</s> Some servers do not answer to `HEAD` requests.
 
 * Find urls in the `text/html` document. At the moment the only reasonable source of uls is the `<a href="url">` html tag.
 

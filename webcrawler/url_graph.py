@@ -57,8 +57,8 @@ class UrlGraph:
 			self._nodes[url_node_str] = node
 		return node
 
-	def add_node(self, url_node_str1):
-		return self._add_if_not_exists_and_get_node(url_node_str1)
+	def add_node(self, url_node_str):
+		return self._add_if_not_exists_and_get_node(url_node_str)
 
 	def add_connection(self, url_str_from, url_str_to):
 
@@ -82,3 +82,7 @@ class UrlGraph:
 	
 	def get_nodes(self):
 		return self._nodes.values()
+	
+	def __str__(self):
+		nodes = self.get_nodes()
+		return '\n'.join(map(lambda node: str(node), nodes))

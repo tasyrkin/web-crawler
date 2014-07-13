@@ -39,7 +39,7 @@ class ParamsManager:
 					self.params[key] = ParamsEntry(self.__to_bool(new_value), def_entry.descr, def_entry.is_mandatory)
 				else:
 					self.params[key] = ParamsEntry(new_value, def_entry.descr, def_entry.is_mandatory)
-			
+
 			if arg in ['-?', '-h', '--help']:
 				self.print_help()
 
@@ -67,7 +67,7 @@ class ParamsManager:
 	def __print_params(self, params_map):
 		self.__print_params_iter(filter(lambda x: x[1].is_mandatory, params_map.iteritems()))
 		self.__print_params_iter(filter(lambda x: not x[1].is_mandatory, params_map.iteritems()))
-	
+
 	def print_help(self):
 		print 'Parameters: '
 		self.__print_params(self.default_params)
