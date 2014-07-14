@@ -18,3 +18,5 @@ TODOs:
     Possible parameters `from` and `until` may accept a wide range of dates. It needs to be understood how to handle such urls.
 
 * Persist the url graph periodically and implement possibility to start with the persisted graph
+
+* Create configuration file and a small library to access it
