@@ -4,6 +4,7 @@ import httplib
 from lxml import etree
 from crawler_params import ParamsManager
 from url_graph import UrlGraph
+import time
 
 def get_prefixed_string_or_empty(string, prefix):
 	return prefix + string if string != '' else '' 
@@ -65,12 +66,14 @@ def traverse_web_graph(start_url):
 		graph.add_node(parsed_url.geturl())
 
 		parsed_fetched_urls = fetch_urls(parsed_url)
-		parsed_urls_queue.extend(parsed_fetched_urls)
-		
-		print 'fetched urls {}'.format(str(parsed_fetched_urls))
+		parsed_urls_queue.extend(filter(lambda url: url.geturl() not in visited_urls, parsed_fetched_urls))
+
+		print 'for url {} fetched urls {}'.format(parsed_url.geturl(), str(map(lambda parsed_url: parsed_url.geturl(), parsed_fetched_urls)))
 
 		for parsed_fetched_url in parsed_fetched_urls:
 			graph.add_connection(parsed_url.geturl(), parsed_fetched_url.geturl())
+
+		time.sleep(10)
 
 params_manager = ParamsManager(sys.argv)
 

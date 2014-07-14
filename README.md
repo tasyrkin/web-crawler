@@ -8,6 +8,7 @@ TODOs:
     * <s>Possible solution: request only a header with `HEAD` request. Needs to be proved if there are servers which don't implement the method</s> Some servers do not answer to `HEAD` requests.
 
 * Find urls in the `text/html` document. At the moment the only reasonable source of uls is the `<a href="url">` html tag.
+    * Unable to parse data from [http://maps.google.de/maps?hl=de&tab=wl], error [line 41: htmlParseEntityRef: no name]
 
 * Handle relative urls within the document.
 
