@@ -9,6 +9,8 @@ TODOs:
 
 * Find urls in the `text/html` document. At the moment the only reasonable source of uls is the `<a href="url">` html tag.
     * Unable to parse data from [http://maps.google.de/maps?hl=de&tab=wl], error [line 41: htmlParseEntityRef: no name]
+    * Unable to parse data from [http://www.faz.net/-gas-7rli5], error [line 1: Char 0x0 out of allowed range]
+    * Unable to parse data from [http://www.news.ch/Keine+Waffenruhe+in+Sicht+Arabische+Liga+verurteilt+Israel/632206/detail.htm], error [line 1100: htmlParseEntityRef: expecting ';']
 
 * Handle relative urls within the document.
 

@@ -72,12 +72,9 @@ def traverse_url_graph(url_graph):
 
 		for parsed_fetched_url in parsed_fetched_urls:
 			url_graph.add_connection(parsed_url.geturl(), parsed_fetched_url.geturl())
-
-		time.sleep(10)
 		
 def persist_url_graph(url_graph):
-	manager = PersistenceManager(url_graph)
-	manager.run()
+	PersistenceManager(url_graph).run()
 
 if __name__ == '__main__':
 	params_manager = ParamsManager(sys.argv)

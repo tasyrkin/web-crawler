@@ -7,8 +7,8 @@ import os
 logging.config.fileConfig('../resources/logging.conf')
 logger = logging.getLogger(__name__)
 
-_NEIGHBOURS_SEPARATOR = ','
-_CONNECTIONS_SEPARATOR = '->'
+_NEIGHBOURS_SEPARATOR = '"'
+_CONNECTIONS_SEPARATOR = '^^'
 
 class UrlGraphFilePersister:
 
