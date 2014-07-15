@@ -51,6 +51,7 @@ class PersistenceManager:
 	def _run_cycle(self, datetime_now):
 		file_path = self._get_persistence_file_path(datetime_now, self._version)
 		self._persister.persist(file_path, self._url_graph)
+		logger.debug('Persisted url graph, version {}'.format(self._version))
 		self._version += 1
 
 	def run(self):

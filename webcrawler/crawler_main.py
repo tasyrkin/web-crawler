@@ -6,6 +6,8 @@ import time
 from crawler_params import ParamsManager
 from url_graph import UrlGraph
 from persistence import UrlGraphFileLoader
+from persistence import PersistenceManager
+import threading
 
 def get_prefixed_string_or_empty(string, prefix):
 	return prefix + string if string != '' else '' 
@@ -38,7 +40,7 @@ def fetch_urls(parsed_url):
 	for url_element in found_url_elements:
 		for key in url_element.keys():
 			if key == 'href':
-				href = url_element.get_value(key)
+				href = url_element.get(key)
 				parsed_href = urlparse.urlparse(href)
 				if not parsed_href.scheme:
 					joined_href = urlparse.urljoin(parsed_url.geturl(), href)
@@ -47,7 +49,7 @@ def fetch_urls(parsed_url):
 
 	return parsed_found_urls
 
-def traverse_web_graph(url_graph):
+def traverse_url_graph(url_graph):
 
 	start_urls = map(lambda node: node.get_url(), url_graph.get_nodes_without_neighbours())
 
@@ -72,6 +74,10 @@ def traverse_web_graph(url_graph):
 			url_graph.add_connection(parsed_url.geturl(), parsed_fetched_url.geturl())
 
 		time.sleep(10)
+		
+def persist_url_graph(url_graph):
+	manager = PersistenceManager(url_graph)
+	manager.run()
 
 if __name__ == '__main__':
 	params_manager = ParamsManager(sys.argv)
@@ -82,6 +88,9 @@ if __name__ == '__main__':
 
 	graph.add_node(params_manager.get_value(ParamsManager.PARAM_INIT_URL))
 
-	print str(graph)
+	th = threading.Thread(target=persist_url_graph, args=(graph,))
+	th.start()
 
-	traverse_web_graph(graph)
+	traverse_url_graph(graph)
+
+	th.join()
