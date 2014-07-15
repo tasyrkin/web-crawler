@@ -12,11 +12,13 @@ class ParamsEntry:
 
 class ParamsManager:
 	PARAM_INIT_URL = 'init_url'
+	PARAM_URL_GRAPH_FILE_PATH = 'url_graph_file_path'
 
 	_BOOLEAN_PARAMS = []
 
 	default_params = {
-			PARAM_INIT_URL			:	ParamsEntry(None, 'Initial url which the crawling starts from', True)
+			PARAM_INIT_URL				:	ParamsEntry(None, 'Initial url which the crawling starts from', True),
+			PARAM_URL_GRAPH_FILE_PATH	:	ParamsEntry(None, 'File with persisted url graph', False)
 	}
 
 	def __init__(self, cmd_args):
@@ -55,10 +57,13 @@ class ParamsManager:
 	def __to_bool(self, str_val):
 		return str_val in ['True', 'true', '1', 't', 'T']
 
-	def get(self, key):
+	def get_value(self, key):
 		entry = self.params.get(key)
 		assert entry is not None, 'Key {} not found'.format(key)
 		return entry.value
+
+	def has_value(self, key):
+		return self.get_value(key) is not None
 
 	def __print_params_iter(self, dict_iter):
 		for key, entry in sorted(dict_iter):

@@ -26,7 +26,7 @@ class UrlNode:
 	
 	@staticmethod
 	def _truncate_list_for_string(lst, limit):
-		return str(lst[0:limit]) + (', ...' if len(lst)>limit else '')
+		return ','.join(lst[0:limit]) + (',...' if len(lst)>limit else '')
 
 	def __str__(self):
 		neighbour_urls = self._get_neighbour_urls()
@@ -67,7 +67,7 @@ class UrlGraph:
 
 		url_str_from = url_str_from.strip()
 		url_str_to = url_str_to.strip()
-		
+
 		if url_str_from == url_str_to:
 			logger.warn('Attemption to connect the url [{}] to itself is ignored'.format(url_str_from))
 			return
@@ -79,10 +79,13 @@ class UrlGraph:
 
 	def get_node(self, node_url_str):
 		return self._nodes.get(node_url_str)
-	
+
 	def get_nodes(self):
 		return self._nodes.values()
-	
+
+	def get_nodes_without_neighbours(self):
+		return filter(lambda node: len(node.get_nodes()) == 0, self.get_nodes())
+
 	def __str__(self):
 		nodes = self.get_nodes()
 		return '\n'.join(map(lambda node: str(node), nodes))

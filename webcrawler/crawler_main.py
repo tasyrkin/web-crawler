@@ -2,9 +2,10 @@ import urlparse
 import sys
 import httplib
 from lxml import etree
+import time
 from crawler_params import ParamsManager
 from url_graph import UrlGraph
-import time
+from persistence import UrlGraphFileLoader
 
 def get_prefixed_string_or_empty(string, prefix):
 	return prefix + string if string != '' else '' 
@@ -37,7 +38,7 @@ def fetch_urls(parsed_url):
 	for url_element in found_url_elements:
 		for key in url_element.keys():
 			if key == 'href':
-				href = url_element.get(key)
+				href = url_element.get_value(key)
 				parsed_href = urlparse.urlparse(href)
 				if not parsed_href.scheme:
 					joined_href = urlparse.urljoin(parsed_url.geturl(), href)
@@ -46,14 +47,11 @@ def fetch_urls(parsed_url):
 
 	return parsed_found_urls
 
-def traverse_web_graph(start_url):
+def traverse_web_graph(url_graph):
 
-	graph = UrlGraph()
+	start_urls = map(lambda node: node.get_url(), url_graph.get_nodes_without_neighbours())
 
-	parsed_url = urlparse.urlparse(start_url)
-	graph.add_node(parsed_url.geturl())
-
-	parsed_urls_queue = [parsed_url]
+	parsed_urls_queue = map(lambda url: urlparse.urlparse(url), start_urls)
 	visited_urls = set()
 
 	while len(parsed_urls_queue) > 0:
@@ -63,7 +61,7 @@ def traverse_web_graph(start_url):
 			print ('[{}] already visited...skipping...'.format(parsed_url.geturl()))
 			continue
 		visited_urls.add(parsed_url.geturl())
-		graph.add_node(parsed_url.geturl())
+		url_graph.add_node(parsed_url.geturl())
 
 		parsed_fetched_urls = fetch_urls(parsed_url)
 		parsed_urls_queue.extend(filter(lambda url: url.geturl() not in visited_urls, parsed_fetched_urls))
@@ -71,10 +69,19 @@ def traverse_web_graph(start_url):
 		print 'for url {} fetched urls {}'.format(parsed_url.geturl(), str(map(lambda parsed_url: parsed_url.geturl(), parsed_fetched_urls)))
 
 		for parsed_fetched_url in parsed_fetched_urls:
-			graph.add_connection(parsed_url.geturl(), parsed_fetched_url.geturl())
+			url_graph.add_connection(parsed_url.geturl(), parsed_fetched_url.geturl())
 
 		time.sleep(10)
 
-params_manager = ParamsManager(sys.argv)
+if __name__ == '__main__':
+	params_manager = ParamsManager(sys.argv)
 
-traverse_web_graph(params_manager.get(ParamsManager.PARAM_INIT_URL))
+	graph = UrlGraph()
+	if params_manager.has_value(ParamsManager.PARAM_URL_GRAPH_FILE_PATH):
+		graph = UrlGraphFileLoader().load(params_manager.get_value(ParamsManager.PARAM_URL_GRAPH_FILE_PATH)) 
+
+	graph.add_node(params_manager.get_value(ParamsManager.PARAM_INIT_URL))
+
+	print str(graph)
+
+	traverse_web_graph(graph)

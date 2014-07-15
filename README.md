@@ -20,3 +20,4 @@ TODOs:
 * Persist the url graph periodically and implement possibility to start with the persisted graph
 
 * Create configuration file and a small library to access it
+    * Separate the configuration for tests and production
