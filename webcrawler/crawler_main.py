@@ -24,7 +24,7 @@ def fetch_urls(parsed_url):
 		print 'Unable to fetch data from [{}], error [{}]'.format(parsed_url.geturl(), str(e))
 		return []
 
-	if 'text/html' not in content_type.split(';'):
+	if content_type is None or 'text/html' not in content_type.split(';'):
 		print 'Fetched content type [{}] is skipped'.format(content_type)
 		return []
 
@@ -40,7 +40,7 @@ def fetch_urls(parsed_url):
 	for url_element in found_url_elements:
 		for key in url_element.keys():
 			if key == 'href':
-				href = url_element.get(key)
+				href = url_element.get(key).encode('utf-8')
 				parsed_href = urlparse.urlparse(href)
 				if not parsed_href.scheme:
 					joined_href = urlparse.urljoin(parsed_url.geturl(), href)
@@ -53,7 +53,7 @@ def traverse_url_graph(url_graph):
 
 	start_urls = map(lambda node: node.get_url(), url_graph.get_nodes_without_neighbours())
 
-	parsed_urls_queue = map(lambda url: urlparse.urlparse(url), start_urls)
+	parsed_urls_queue = map(lambda url: urlparse.urlparse(url.encode('utf-8')), start_urls)
 	visited_urls = set()
 
 	while len(parsed_urls_queue) > 0:
