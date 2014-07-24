@@ -9,8 +9,25 @@ from persistence import UrlGraphFileLoader
 from persistence import PersistenceManager
 import threading
 
+CONTENT_TYPE = 'text/html'
+DEFAULT_ENCODING = 'UTF-8'
+
 def get_prefixed_string_or_empty(string, prefix):
 	return prefix + string if string != '' else ''
+
+
+def parse_content_type_and_encoding(header_content_type):
+	assert header_content_type is not None, 'header_content_type is missing'
+
+	content_type_and_encoding = map(lambda element: element.strip(), header_content_type.split(';'))
+
+	encoding = DEFAULT_ENCODING
+	if len(content_type_and_encoding) == 1:
+		return content_type_and_encoding[0], encoding
+	if len(content_type_and_encoding) >= 2:
+		if '=' in content_type_and_encoding[1]:
+			encoding = content_type_and_encoding[1].split('=')[1]
+		return content_type_and_encoding[0], encoding 
 
 def fetch_urls(parsed_url):
 
@@ -18,18 +35,27 @@ def fetch_urls(parsed_url):
 		conn = httplib.HTTPConnection(parsed_url.netloc)
 		conn.request("GET", parsed_url.path + get_prefixed_string_or_empty(parsed_url.query, '?') + get_prefixed_string_or_empty(parsed_url.fragment, '#'))
 		resp = conn.getresponse()
-		content_type = resp.getheader("content-type")
+		header_content_type = resp.getheader("content-type")
 		data = resp.read()
 	except Exception, e:
 		print 'Unable to fetch data from [{}], error [{}]'.format(parsed_url.geturl(), str(e))
 		return []
+	
+	if header_content_type is None:
+		print 'Fetched content type [{}] is skipped'.format(header_content_type)
+		return []
 
-	if content_type is None or 'text/html' not in content_type.split(';'):
-		print 'Fetched content type [{}] is skipped'.format(content_type)
+	content_type, encoding = parse_content_type_and_encoding(header_content_type)
+	
+	if len(content_type) == 0 or len(encoding) == 0:
+		print 'Fetched content type [{}] and encoding [{}] are skipped'.format(content_type, encoding)
+
+	if 'text/html' != content_type:
+		print 'Fetched content type [{}] is skipped'.format(header_content_type)
 		return []
 
 	try:
-		html_dom = etree.HTML(data)
+		html_dom = etree.HTML(data.decode(encoding))
 	except Exception, e:
 		print 'Unable to parse data from [{}], error [{}]'.format(parsed_url.geturl(), str(e))
 		return []
