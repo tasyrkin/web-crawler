@@ -2,38 +2,52 @@ import urlparse
 import sys
 import httplib
 from lxml import etree
-import time
+import threading
+import logging
+
 from crawler_params import ParamsManager
 from url_graph import UrlGraph
 from persistence import UrlGraphFileLoader
 from persistence import PersistenceManager
-import threading
+
+logging.config.fileConfig('../resources/logging.conf')
+logger = logging.getLogger(__name__)
 
 CONTENT_TYPE = 'text/html'
-DEFAULT_ENCODING = 'UTF-8'
+DEFAULT_CHARSET = 'UTF-8'
 
 def get_prefixed_string_or_empty(string, prefix):
 	return prefix + string if string != '' else ''
 
 
-def parse_content_type_and_encoding(header_content_type):
+def parse_content_type_and_charset(header_content_type):
 	assert header_content_type is not None, 'header_content_type is missing'
 
-	content_type_and_encoding = map(lambda element: element.strip(), header_content_type.split(';'))
+	content_type_and_charset = map(lambda element: element.strip(), header_content_type.split(';'))
 
-	encoding = DEFAULT_ENCODING
-	if len(content_type_and_encoding) == 1:
-		return content_type_and_encoding[0], encoding
-	if len(content_type_and_encoding) >= 2:
-		if '=' in content_type_and_encoding[1]:
-			encoding = content_type_and_encoding[1].split('=')[1]
-		return content_type_and_encoding[0], encoding 
+	charset = DEFAULT_CHARSET
+	if len(content_type_and_charset) == 1:
+		return content_type_and_charset[0], charset
+	if len(content_type_and_charset) >= 2:
+		charset_and_encoding = content_type_and_charset[1]
+		if '=' in charset_and_encoding:
+			charset_and_encoding_list = charset_and_encoding.split('=')
+			if len(charset_and_encoding_list) == 2:
+				charset = charset_and_encoding_list[1].strip()
+		return content_type_and_charset[0], charset
+
+
+def fetching_stopped_because_no_http_content_type(string_url, header_content_type):
+	if header_content_type is None:
+		logger.warn('[{}]: fetched content type [{}] is skipped'.format(string_url, header_content_type))
+		return []
 
 def fetch_urls(parsed_url):
 
 	try:
 		conn = httplib.HTTPConnection(parsed_url.netloc)
-		conn.request("GET", parsed_url.path + get_prefixed_string_or_empty(parsed_url.query, '?') + get_prefixed_string_or_empty(parsed_url.fragment, '#'))
+		string_url = parsed_url.path + get_prefixed_string_or_empty(parsed_url.query, '?') + get_prefixed_string_or_empty(parsed_url.fragment, '#') 
+		conn.request("GET", string_url)
 		resp = conn.getresponse()
 		header_content_type = resp.getheader("content-type")
 		data = resp.read()
@@ -41,11 +55,10 @@ def fetch_urls(parsed_url):
 		print 'Unable to fetch data from [{}], error [{}]'.format(parsed_url.geturl(), str(e))
 		return []
 	
-	if header_content_type is None:
-		print 'Fetched content type [{}] is skipped'.format(header_content_type)
+	if(fetching_stopped_because_no_http_content_type(string_url, header_content_type)):
 		return []
 
-	content_type, encoding = parse_content_type_and_encoding(header_content_type)
+	content_type, encoding = parse_content_type_and_charset(header_content_type)
 	
 	if len(content_type) == 0 or len(encoding) == 0:
 		print 'Fetched content type [{}] and encoding [{}] are skipped'.format(content_type, encoding)
