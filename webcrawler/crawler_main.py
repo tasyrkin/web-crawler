@@ -39,38 +39,46 @@ def parse_content_type_and_charset(header_content_type):
 
 def fetching_stopped_because_no_http_content_type(string_url, header_content_type):
 	if header_content_type is None:
-		logger.warn('[{}]: fetched content type [{}] is skipped'.format(string_url, header_content_type))
-		return []
+		logger.warn('Fetched content type [{}] is skipped, url: [{}]'.format(header_content_type, string_url))
+		return True
+	return False
+
+def fetching_stopped_because_no_content_type_or_charset(string_url, content_type, charset):
+	if len(content_type) == 0 or len(charset) == 0:
+		print 'Fetched content type [{}] or encoding [{}] is empty, url: [{}]'.format(content_type, charset, string_url)
+		return True
+	return False
+
+def fetching_stopped_because_unsupported_content_type(string_url, content_type):
+	if 'text/html' != content_type:
+		print 'Fetched content type [{}] is skipped, url: [{}]'.format(content_type, string_url)
+		return True
+	return False
 
 def fetch_urls(parsed_url):
 
 	try:
 		conn = httplib.HTTPConnection(parsed_url.netloc)
-		string_url = parsed_url.path + get_prefixed_string_or_empty(parsed_url.query, '?') + get_prefixed_string_or_empty(parsed_url.fragment, '#') 
-		conn.request("GET", string_url)
+		conn.request("GET", parsed_url.geturl())
 		resp = conn.getresponse()
 		header_content_type = resp.getheader("content-type")
 		data = resp.read()
 	except Exception, e:
 		print 'Unable to fetch data from [{}], error [{}]'.format(parsed_url.geturl(), str(e))
 		return []
-	
-	if(fetching_stopped_because_no_http_content_type(string_url, header_content_type)):
+
+	if fetching_stopped_because_no_http_content_type(parsed_url.geturl(), header_content_type):
 		return []
 
-	content_type, encoding = parse_content_type_and_charset(header_content_type)
-	
-	if len(content_type) == 0 or len(encoding) == 0:
-		print 'Fetched content type [{}] and encoding [{}] are skipped'.format(content_type, encoding)
+	content_type, charset = parse_content_type_and_charset(header_content_type)
 
-	if 'text/html' != content_type:
-		print 'Fetched content type [{}] is skipped'.format(header_content_type)
+	if fetching_stopped_because_no_content_type_or_charset(parsed_url.geturl(), content_type, charset):
 		return []
 
 	try:
-		html_dom = etree.HTML(data.decode(encoding))
+		html_dom = etree.HTML(data.decode(charset))
 	except Exception, e:
-		print 'Unable to parse data from [{}], error [{}]'.format(parsed_url.geturl(), str(e))
+		print 'Unable to parse data, error [{}], url: [{}]'.format(str(e), parsed_url.geturl())
 		return []
 
 	found_url_elements = html_dom.xpath('//a')
