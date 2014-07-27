@@ -74,7 +74,7 @@ def find_urls_in_html_dom(parsed_url, html_dom):
 
 	url_elements = html_dom.xpath('//a')
 
-	parsed_found_urls = []
+	parsed_found_urls = set()
 
 	for url_element in url_elements:
 		for url_element_key in url_element.keys():
@@ -85,11 +85,12 @@ def find_urls_in_html_dom(parsed_url, html_dom):
 				if not parsed_href.scheme:
 					joined_href = urlparse.urljoin(parsed_url.geturl(), href)
 					parsed_href = urlparse.urlparse(joined_href)
-				parsed_found_urls.append(parsed_href)
+				parsed_found_urls.add(parsed_href)
 	return parsed_found_urls
 
 def parse_data_into_html_dom(data, charset):
-	html_dom = etree.HTML(data.decode(charset))
+	data_in_unicode = data.decode(charset)
+	html_dom = etree.HTML(data_in_unicode)
 	return html_dom
 
 def fetch_urls(parsed_url):
@@ -140,7 +141,7 @@ def traverse_url_graph(url_graph):
 		parsed_fetched_urls = fetch_urls(parsed_url)
 		parsed_urls_stack.extend(filter(lambda url: url.geturl() not in visited_urls, parsed_fetched_urls))
 
-		print 'for url {} fetched urls {}'.format(parsed_url.geturl(), str(map(lambda parsed_url: parsed_url.geturl(), parsed_fetched_urls)))
+		print 'for url {} fetched urls ({}) {}'.format(parsed_url.geturl(), str(len(parsed_fetched_urls)), str(map(lambda parsed_url: parsed_url.geturl(), parsed_fetched_urls)))
 
 		for parsed_fetched_url in parsed_fetched_urls:
 			url_graph.add_connection(parsed_url.geturl(), parsed_fetched_url.geturl())
