@@ -55,16 +55,49 @@ def fetching_stopped_because_unsupported_content_type(string_url, content_type):
 		return True
 	return False
 
+def fetching_stopped_because_no_xpath(string_url, html_dom):
+	if not hasattr(html_dom, 'xpath'):
+		print 'Fetched dom object does not have xpath function, url: [{}]'.format(string_url)
+		return True
+	return False
+
+def fetch_header_content_type_and_data(parsed_url):
+	conn = httplib.HTTPConnection(parsed_url.netloc)
+	conn.request("GET", parsed_url.geturl())
+	resp = conn.getresponse()
+	header_content_type = resp.getheader("content-type")
+	data = resp.read()
+	return header_content_type, data
+
+
+def find_urls_in_html_dom(parsed_url, html_dom):
+
+	url_elements = html_dom.xpath('//a')
+
+	parsed_found_urls = []
+
+	for url_element in url_elements:
+		for url_element_key in url_element.keys():
+
+			if url_element_key == 'href':
+				href = url_element.get(url_element_key)
+				parsed_href = urlparse.urlparse(href)
+				if not parsed_href.scheme:
+					joined_href = urlparse.urljoin(parsed_url.geturl(), href)
+					parsed_href = urlparse.urlparse(joined_href)
+				parsed_found_urls.append(parsed_href)
+	return parsed_found_urls
+
+def parse_data_into_html_dom(data, charset):
+	html_dom = etree.HTML(data.decode(charset))
+	return html_dom
+
 def fetch_urls(parsed_url):
 
 	try:
-		conn = httplib.HTTPConnection(parsed_url.netloc)
-		conn.request("GET", parsed_url.geturl())
-		resp = conn.getresponse()
-		header_content_type = resp.getheader("content-type")
-		data = resp.read()
+		header_content_type, data = fetch_header_content_type_and_data(parsed_url)
 	except Exception, e:
-		print 'Unable to fetch data from [{}], error [{}]'.format(parsed_url.geturl(), str(e))
+		print 'Unable to fetch data, error [{}], url: [{}]'.format(str(e), parsed_url.geturl())
 		return []
 
 	if fetching_stopped_because_no_http_content_type(parsed_url.geturl(), header_content_type):
@@ -76,25 +109,15 @@ def fetch_urls(parsed_url):
 		return []
 
 	try:
-		html_dom = etree.HTML(data.decode(charset))
+		html_dom = parse_data_into_html_dom(data, charset)
 	except Exception, e:
 		print 'Unable to parse data, error [{}], url: [{}]'.format(str(e), parsed_url.geturl())
 		return []
 
-	found_url_elements = html_dom.xpath('//a')
+	if fetching_stopped_because_no_xpath(parsed_url.geturl(), html_dom):
+		return []
 
-	parsed_found_urls = []
-	for url_element in found_url_elements:
-		for key in url_element.keys():
-			if key == 'href':
-				href = url_element.get(key)
-				parsed_href = urlparse.urlparse(href)
-				if not parsed_href.scheme:
-					joined_href = urlparse.urljoin(parsed_url.geturl(), href)
-					parsed_href = urlparse.urlparse(joined_href)
-				parsed_found_urls.append(parsed_href)
-
-	return parsed_found_urls
+	return find_urls_in_html_dom(parsed_url, html_dom)
 
 def traverse_url_graph(url_graph):
 
