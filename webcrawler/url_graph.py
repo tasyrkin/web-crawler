@@ -49,6 +49,11 @@ class UrlGraph:
 	'''
 	def __init__(self):
 		self._nodes = dict()
+		
+	def _validate_url_node_str(self, url_node_str):
+		assert url_node_str is not None, 'Expected url node string to be not None'
+		assert isinstance(url_node_str, unicode), 'Expected url node string to be unicode, but was [{}], url [{}]'.format(type(url_node_str), url_node_str)
+		assert url_node_str.strip() != '', 'Expected non empty url node string, but was {}'.format(url_node_str.encode('utf-8'))
 
 	def _add_if_not_exists_and_get_node(self, url_node_str):
 		node = self._nodes.get(url_node_str)
@@ -58,12 +63,13 @@ class UrlGraph:
 		return node
 
 	def add_node(self, url_node_str):
+		self._validate_url_node_str(url_node_str)
 		return self._add_if_not_exists_and_get_node(url_node_str)
 
 	def add_connection(self, url_str_from, url_str_to):
 
-		assert isinstance(url_str_from, str) and url_str_from.strip() != '', 'Expected non empty url, but was {}'.format(url_str_from)
-		assert isinstance(url_str_to, str) and url_str_to.strip() != '', 'Expected non empty url, but was {}'.format(url_str_to)
+		self._validate_url_node_str(url_str_from)
+		self._validate_url_node_str(url_str_to)
 
 		url_str_from = url_str_from.strip()
 		url_str_to = url_str_to.strip()

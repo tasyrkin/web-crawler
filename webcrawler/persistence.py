@@ -9,14 +9,15 @@ logger = logging.getLogger(__name__)
 
 _NEIGHBOURS_SEPARATOR = '"'
 _CONNECTIONS_SEPARATOR = '^^'
+_CHARSET = 'utf-8'
 
 class UrlGraphFilePersister:
 
 	def persist(self, file_name, url_graph):
 		with open(file_name, 'w') as f:
 			for url_node in url_graph.get_nodes():
-				neighbours = _NEIGHBOURS_SEPARATOR.join(map(lambda node: node.get_url(), url_node.get_nodes()))
-				f.write("{}{}{}\n".format(url_node.get_url(), _CONNECTIONS_SEPARATOR, neighbours))
+				neighbours = _NEIGHBOURS_SEPARATOR.join(map(lambda node: node.get_url().encode(_CHARSET), url_node.get_nodes()))
+				f.write("{}{}{}\n".format(url_node.get_url().encode(_CHARSET), _CONNECTIONS_SEPARATOR, neighbours))
 
 
 class UrlGraphFileLoader:
@@ -28,21 +29,21 @@ class UrlGraphFileLoader:
 			for line in f.readlines():
 				head_and_neighbours = line.split(_CONNECTIONS_SEPARATOR, 1)
 				assert len(head_and_neighbours) == 2, 'Unexpected url node persisted format, found [{}]'.format(head_and_neighbours)
-				head_node = head_and_neighbours[0].strip()
+				head_node = head_and_neighbours[0].strip().decode(_CHARSET)
 				for neighbour in [neighbour.strip() for neighbour in head_and_neighbours[1].split(_NEIGHBOURS_SEPARATOR) if neighbour.strip()!='']:
-					graph.add_connection(head_node, neighbour)
+					graph.add_connection(head_node, neighbour.decode(_CHARSET))
 			return graph
 
 class PersistenceManager:
 	TIME_PERIOD_IN_SECONDS = 10
 	STORAGE_DIRECTORY = '../storage'
 	PERSISTENCE_FILE_TEMPLATE = 'url_graph_{}.version_{}'
-	
+
 	def __init__(self, url_graph):
 		self._url_graph = url_graph
 		self._version = 1
 		self._persister = UrlGraphFilePersister()
-	
+
 	def _get_persistence_file_path(self, datetime_now, version):
 		datetime_format = datetime_now.strftime('%Y-%m-%d_%H-%M-%S_%f')
 		file_name = PersistenceManager.PERSISTENCE_FILE_TEMPLATE.format(datetime_format, version) 

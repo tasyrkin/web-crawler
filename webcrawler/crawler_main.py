@@ -70,7 +70,7 @@ def fetch_header_content_type_and_data(parsed_url):
 	return header_content_type, data
 
 
-def find_urls_in_html_dom(parsed_url, html_dom):
+def find_urls_in_html_dom(parsed_url, html_dom, charset):
 
 	url_elements = html_dom.xpath('//a')
 
@@ -80,7 +80,7 @@ def find_urls_in_html_dom(parsed_url, html_dom):
 		for url_element_key in url_element.keys():
 
 			if url_element_key == 'href':
-				href = url_element.get(url_element_key)
+				href = url_element.get(url_element_key).decode(charset)
 				parsed_href = urlparse.urlparse(href)
 				if not parsed_href.scheme:
 					joined_href = urlparse.urljoin(parsed_url.geturl(), href)
@@ -118,7 +118,7 @@ def fetch_urls(parsed_url):
 	if fetching_stopped_because_no_xpath(parsed_url.geturl(), html_dom):
 		return []
 
-	return find_urls_in_html_dom(parsed_url, html_dom)
+	return find_urls_in_html_dom(parsed_url, html_dom, charset)
 
 def traverse_url_graph(url_graph):
 
@@ -156,7 +156,8 @@ if __name__ == '__main__':
 	if params_manager.has_value(ParamsManager.PARAM_URL_GRAPH_FILE_PATH):
 		graph = UrlGraphFileLoader().load(params_manager.get_value(ParamsManager.PARAM_URL_GRAPH_FILE_PATH)) 
 
-	graph.add_node(params_manager.get_value(ParamsManager.PARAM_INIT_URL))
+	start_url_unicode = params_manager.get_value(ParamsManager.PARAM_INIT_URL).decode('utf-8')
+	graph.add_node(start_url_unicode)
 
 	th = threading.Thread(target=persist_url_graph, args=(graph,))
 	th.start()
