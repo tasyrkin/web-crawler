@@ -80,7 +80,7 @@ def find_urls_in_html_dom(parsed_url, html_dom, charset):
 		for url_element_key in url_element.keys():
 
 			if url_element_key == 'href':
-				href_str = url_element.get(url_element_key)
+				href_str = url_element.get(url_element_key).replace('\n', '').replace('\t', '').replace(' ', '')
 				try:
 					href_unicode = href_str.decode(charset)
 				except Exception, e:
