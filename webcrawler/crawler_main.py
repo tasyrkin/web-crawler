@@ -80,10 +80,15 @@ def find_urls_in_html_dom(parsed_url, html_dom, charset):
 		for url_element_key in url_element.keys():
 
 			if url_element_key == 'href':
-				href = url_element.get(url_element_key).decode(charset)
-				parsed_href = urlparse.urlparse(href)
+				href_str = url_element.get(url_element_key)
+				try:
+					href_unicode = href_str.decode(charset)
+				except Exception, e:
+					print 'Failed to parse href into unicode using charset [{}], error: {}'.format(charset, str(e))
+					continue
+				parsed_href = urlparse.urlparse(href_unicode)
 				if not parsed_href.scheme:
-					joined_href = urlparse.urljoin(parsed_url.geturl(), href)
+					joined_href = urlparse.urljoin(parsed_url.geturl(), href_unicode)
 					parsed_href = urlparse.urlparse(joined_href)
 				parsed_found_urls.add(parsed_href)
 	return parsed_found_urls
@@ -131,6 +136,7 @@ def traverse_url_graph(url_graph):
 
 	while len(parsed_urls_stack) > 0:
 		parsed_url = parsed_urls_stack.pop()
+		print 'Processing url: [{}]'.format(parsed_url.geturl())
 
 		if parsed_url.geturl() in visited_urls:
 			print ('[{}] already visited...skipping...'.format(parsed_url.geturl()))
