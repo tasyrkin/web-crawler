@@ -128,11 +128,15 @@ def fetch_urls(parsed_url):
 def traverse_url_graph(url_graph):
 
 	start_urls = map(lambda node: node.get_url(), url_graph.get_nodes_without_neighbours())
+	all_graph_urls = map(lambda node: node.get_url(), url_graph.get_nodes())
 
-	print start_urls
+	visited_urls = set(all_graph_urls)
+	visited_urls.difference_update(set(start_urls))
+
+	print 'start_urls: ' + str(len(start_urls) if len(start_urls) > 10 else start_urls)
+	print 'visited_urls: ' + str(len(visited_urls) if len(visited_urls) > 10 else visited_urls)
 
 	parsed_urls_stack = map(lambda url: urlparse.urlparse(url), start_urls)
-	visited_urls = set()
 
 	while len(parsed_urls_stack) > 0:
 		parsed_url = parsed_urls_stack.pop()
