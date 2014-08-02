@@ -5,11 +5,11 @@ from lxml import etree
 import threading
 import logging
 
-import crawler_utils
 from crawler_params import ParamsManager
-from url_graph import UrlGraph
-from persistence import UrlGraphFileLoader
-from persistence import PersistenceManager
+
+import crawler_utils
+import url_graph
+import persistence
 
 logging.config.fileConfig('../resources/logging.conf')
 logger = logging.getLogger(__name__)
@@ -160,19 +160,19 @@ def traverse_url_graph(url_graph, hops_counter):
 		hops_counter.hop()
 
 def persist_url_graph(url_graph):
-	PersistenceManager(url_graph).run()
+	persistence.PersistenceManager(url_graph).run()
 
 if __name__ == '__main__':
 	params_manager = ParamsManager(sys.argv)
 
-	graph = UrlGraph()
+	graph = url_graph.UrlGraph()
 	if params_manager.has_value(ParamsManager.PARAM_URL_GRAPH_FILE_PATH):
-		graph = UrlGraphFileLoader().load(params_manager.get_value(ParamsManager.PARAM_URL_GRAPH_FILE_PATH)) 
+		graph = persistence.UrlGraphFileLoader().load(params_manager.get_value(ParamsManager.PARAM_URL_GRAPH_FILE_PATH)) 
 
 	start_url_unicode = params_manager.get_value(ParamsManager.PARAM_INIT_URL).decode('utf-8')
 	graph.add_node(start_url_unicode)
 
-	hops_counter = crawler_utils.HopsCounter(params_manager.has_get(ParamsManager.PARAM_HOPS_NUM))
+	hops_counter = crawler_utils.HopsCounter(params_manager.get_value(ParamsManager.PARAM_HOPS_NUM))
 
 	th = threading.Thread(target=persist_url_graph, args=(graph,))
 	th.start()
