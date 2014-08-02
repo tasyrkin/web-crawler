@@ -2,9 +2,9 @@ import unittest
 from webcrawler.url_graph import UrlGraph
 from webcrawler.url_graph import UrlNode
 
-NODE_URL_STR1 = 'http://www.google.com'
-NODE_URL_STR2 = 'http://www.amazon.com'
-NODE_URL_STR3 = 'http://www.microsoft.com'
+NODE_URL_STR1 = u'http://www.google.com'
+NODE_URL_STR2 = u'http://www.amazon.com'
+NODE_URL_STR3 = u'http://www.microsoft.com'
 
 class UrlGraphTest(unittest.TestCase):
 

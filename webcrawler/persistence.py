@@ -35,7 +35,7 @@ class UrlGraphFileLoader:
 			return graph
 
 class PersistenceManager:
-	TIME_PERIOD_IN_SECONDS = 10
+	TIME_PERIOD_IN_SECONDS = 5*60
 	STORAGE_DIRECTORY = '../storage'
 	PERSISTENCE_FILE_TEMPLATE = 'url_graph_{}.version_{}'
 

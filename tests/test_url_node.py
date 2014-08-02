@@ -1,10 +1,10 @@
 import unittest
 from webcrawler.url_graph import UrlNode
 
-NODE_URL_STR1 = 'http://www.google.com'
-NODE_URL_STR2 = 'http://www.amazon.com'
-NODE_URL_STR3 = 'http://www.microsoft.com'
-NODE_URL_TEMPLATE_STR = 'http://www.google.com/{}'
+NODE_URL_STR1 = u'http://www.google.com'
+NODE_URL_STR2 = u'http://www.amazon.com'
+NODE_URL_STR3 = u'http://www.microsoft.com'
+NODE_URL_TEMPLATE_STR = u'http://www.google.com/{}'
 
 class UrlNodeTest(unittest.TestCase):
 

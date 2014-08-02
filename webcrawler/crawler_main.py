@@ -5,6 +5,7 @@ from lxml import etree
 import threading
 import logging
 
+import crawler_utils
 from crawler_params import ParamsManager
 from url_graph import UrlGraph
 from persistence import UrlGraphFileLoader
@@ -125,7 +126,7 @@ def fetch_urls(parsed_url):
 
 	return find_urls_in_html_dom(parsed_url, html_dom, charset)
 
-def traverse_url_graph(url_graph):
+def traverse_url_graph(url_graph, hops_counter):
 
 	start_urls = map(lambda node: node.get_url(), url_graph.get_nodes_without_neighbours())
 	all_graph_urls = map(lambda node: node.get_url(), url_graph.get_nodes())
@@ -138,7 +139,7 @@ def traverse_url_graph(url_graph):
 
 	parsed_urls_stack = map(lambda url: urlparse.urlparse(url), start_urls)
 
-	while len(parsed_urls_stack) > 0:
+	while len(parsed_urls_stack) > 0 and hops_counter.can_hop():
 		parsed_url = parsed_urls_stack.pop()
 		print 'Processing url: [{}]'.format(parsed_url.geturl())
 
@@ -156,6 +157,8 @@ def traverse_url_graph(url_graph):
 		for parsed_fetched_url in parsed_fetched_urls:
 			url_graph.add_connection(parsed_url.geturl(), parsed_fetched_url.geturl())
 
+		hops_counter.hop()
+
 def persist_url_graph(url_graph):
 	PersistenceManager(url_graph).run()
 
@@ -169,9 +172,11 @@ if __name__ == '__main__':
 	start_url_unicode = params_manager.get_value(ParamsManager.PARAM_INIT_URL).decode('utf-8')
 	graph.add_node(start_url_unicode)
 
+	hops_counter = crawler_utils.HopsCounter(params_manager.has_get(ParamsManager.PARAM_HOPS_NUM))
+
 	th = threading.Thread(target=persist_url_graph, args=(graph,))
 	th.start()
 
-	traverse_url_graph(graph)
+	traverse_url_graph(graph, hops_counter)
 
 	th.join()

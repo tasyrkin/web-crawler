@@ -5,9 +5,9 @@ from webcrawler.persistence import UrlGraphFilePersister
 from webcrawler.persistence import PersistenceManager
 import datetime
 
-NODE_URL_STR1 = 'http://www.google.com'
-NODE_URL_STR2 = 'http://www.amazon.com'
-NODE_URL_STR3 = 'http://www.microsoft.com'
+NODE_URL_STR1 = u'http://www.google.com'
+NODE_URL_STR2 = u'http://www.amazon.com'
+NODE_URL_STR3 = u'http://www.microsoft.com'
 TEST_FILE_NAME = 'test_file_to_ignore.txt'
 
 class PersistenceTest(unittest.TestCase):

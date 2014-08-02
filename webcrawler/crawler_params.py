@@ -12,12 +12,14 @@ class ParamsEntry:
 
 class ParamsManager:
 	PARAM_INIT_URL = 'init_url'
+	PARAM_HOPS_NUM = 'hops_num'
 	PARAM_URL_GRAPH_FILE_PATH = 'url_graph_file_path'
 
 	_BOOLEAN_PARAMS = []
 
 	default_params = {
 			PARAM_INIT_URL				:	ParamsEntry(None, 'Initial url which the crawling starts from', True),
+			PARAM_HOPS_NUM				:	ParamsEntry(0, 'Number of hops to traverse the graph, 0 - infinite hops', False),
 			PARAM_URL_GRAPH_FILE_PATH	:	ParamsEntry(None, 'File with persisted url graph', False)
 	}
 
